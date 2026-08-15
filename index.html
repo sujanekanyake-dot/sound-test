@@ -3,384 +3,179 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acoustic Range & Tonal Sensitivity Diagnostic</title>
+  <title>Deep Focus Personality Index</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Courier New', Courier, monospace;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body {
-      background: #08080a;
-      color: #7d8590;
+      background-color: #f0f2f5;
+      color: #333;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
-      user-select: none;
     }
 
-    .diagnostic-panel {
-      background: #0d1117;
-      border: 1px solid #21262d;
-      padding: 32px;
-      max-width: 480px;
+    .quiz-card {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      max-width: 520px;
       width: 90%;
-      border-radius: 4px;
-      box-shadow: 0 0 40px rgba(0,0,0,0.9);
-      position: relative;
+      text-align: center;
     }
 
-    .sys-header {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: #388bfd;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid #21262d;
-      padding-bottom: 8px;
+    .quiz-card h2 {
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+      color: #1a1a1a;
     }
 
-    .status-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      background: #238636;
-      border-radius: 50%;
-      box-shadow: 0 0 6px #238636;
+    .quiz-card .subtitle {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 24px;
     }
 
-    h1 {
-      font-size: 1.1rem;
-      color: #e6edf3;
+    .question-text {
+      font-size: 1.15rem;
       font-weight: 600;
-      margin-bottom: 14px;
+      margin-bottom: 20px;
+      color: #222;
     }
 
-    p {
-      font-size: 0.85rem;
-      line-height: 1.6;
-      color: #8b949e;
-      margin-bottom: 24px;
-    }
-
-    .audio-meter {
-      background: #010409;
-      border: 1px solid #30363d;
-      height: 60px;
-      border-radius: 4px;
-      margin-bottom: 24px;
+    .options {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .waveform-line {
-      width: 100%;
-      height: 2px;
-      background: #1f6feb;
-      opacity: 0.4;
-      animation: pulse 1.8s infinite ease-in-out;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scaleY(1); opacity: 0.3; }
-      50% { transform: scaleY(6); opacity: 0.7; }
-    }
-
-    .meter-text {
-      position: absolute;
-      font-size: 0.7rem;
-      letter-spacing: 1px;
-      color: #484f58;
-    }
-
-    .btn {
-      background: #21262d;
-      color: #c9d1d9;
-      border: 1px solid #30363d;
-      padding: 12px;
-      font-size: 0.85rem;
-      width: 100%;
+    .option-btn {
+      background: #f8f9fa;
+      border: 1px solid #dcdfe6;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: 1rem;
       cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      color: #333;
     }
 
-    .btn:hover {
-      background: #30363d;
-      color: #58a6ff;
-      border-color: #58a6ff;
+    .option-btn:hover {
+      background: #0066cc;
+      color: #fff;
+      border-color: #0066cc;
     }
 
-    /* ---------------- HORROR ENGINE OVERLAY ---------------- */
-    #abyss-layer {
+    /* Jumpscare Elements */
+    #scare-screen {
       position: fixed;
-      inset: 0;
-      background: #000;
-      display: none;
-      z-index: 9999999;
-      cursor: none;
-      overflow: hidden;
-    }
-
-    /* Distorted analog feed canvas */
-    #horror-canvas {
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
-      display: block;
-      filter: contrast(300%) brightness(140%) grayscale(40%);
+      background: #000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
     }
 
-    /* Subliminal Static Strobe */
-    .flicker-mesh {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle, transparent 20%, #000 90%);
-      pointer-events: none;
-      mix-blend-mode: multiply;
+    #scare-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      animation: shake 0.08s infinite alternate;
     }
 
-    .red-flash {
-      position: absolute;
-      inset: 0;
-      background: #ff0000;
-      mix-blend-mode: color-burn;
-      pointer-events: none;
-      animation: hyperFlicker 0.03s infinite alternate;
-    }
-
-    @keyframes hyperFlicker {
-      0% { opacity: 0; }
-      50% { opacity: 0.85; }
-      100% { opacity: 0.1; }
+    @keyframes shake {
+      0% { transform: scale(1.1) translate(4px, 4px) rotate(0.5deg); }
+      50% { transform: scale(1.15) translate(-4px, -4px) rotate(-0.5deg); }
+      100% { transform: scale(1.2) translate(3px, -3px) rotate(1deg); }
     }
   </style>
 </head>
 <body>
 
-  <div class="diagnostic-panel" id="panel">
-    <div class="sys-header">
-      <span>System Tone Calibrator v4.2</span>
-      <span><span class="status-dot"></span> Online</span>
+  <div class="quiz-card" id="quiz-box">
+    <h2>Perception & Intuition Test</h2>
+    <p class="subtitle" id="progress">Question 1 of 3</p>
+    <p class="question-text" id="question">What color stands out most to you right now?</p>
+    <div class="options" id="options-container">
+      <button class="option-btn" onclick="nextQuestion()">Deep Crimson</button>
+      <button class="option-btn" onclick="nextQuestion()">Midnight Blue</button>
+      <button class="option-btn" onclick="nextQuestion()">Emerald Green</button>
     </div>
-
-    <h1 id="diag-title">Ultra-Low Frequency Isolation</h1>
-    <p id="diag-desc">
-      This test plays a very faint 18Hz infrasound wave. Set your volume to <strong>75%–100%</strong>, bring your ear close to the device speaker, and press confirm once the tone becomes audible.
-    </p>
-
-    <div class="audio-meter">
-      <div class="waveform-line"></div>
-      <div class="meter-text" id="meter-status">LISTENING: 0.00 dB</div>
-    </div>
-
-    <button class="btn" id="action-btn" onclick="nextStage()">Start Calibration Wave</button>
   </div>
 
-  <div id="abyss-layer">
-    <canvas id="horror-canvas"></canvas>
-    <div class="flicker-mesh"></div>
-    <div class="red-flash"></div>
+  <div id="scare-screen">
+    <!-- Replace the src URL with your preferred horrifying ghost image -->
+    <img id="scare-image" src="https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=1200&q=80" alt="Ghost">
   </div>
+
+  <!-- Screamer Audio -->
+  <audio id="scream-sound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2180/2180-preview.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
-    let stage = 0;
-    let audioCtx;
-
-    function nextStage() {
-      // Initialize Audio Context on first interaction
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const questions = [
+      {
+        q: "What color stands out most to you right now?",
+        options: ["Deep Crimson", "Midnight Blue", "Emerald Green"]
+      },
+      {
+        q: "Listen closely to your surroundings. How many distinct noises do you hear?",
+        options: ["1 to 2 sounds", "3 to 5 sounds", "Complete silence"]
+      },
+      {
+        q: "Focus entirely on the center of the screen. Can you sense movement behind you?",
+        options: ["Yes, distinctly", "No, not at all", "I'm not sure"]
       }
+    ];
 
-      stage++;
+    let currentStep = 0;
 
-      if (stage === 1) {
-        document.getElementById('diag-title').innerText = "Testing Micro-Frequency Shift";
-        document.getElementById('diag-desc').innerHTML = "Tone output is extremely faint. <strong>Turn your device volume to maximum</strong> and place your ear directly against the speaker to detect the micro-tone.";
-        document.getElementById('meter-status').innerText = "AUDIO EMISSION ACTIVE — 18.2 Hz";
-        document.getElementById('action-btn').innerText = "I cannot hear it yet";
+    function nextQuestion() {
+      currentStep++;
 
-        // Play an almost inaudible soft hum to force them to crank the volume
-        playBaitHum();
-      } else if (stage === 2) {
-        document.getElementById('diag-title').innerText = "Signal Attenuation Drop";
-        document.getElementById('diag-desc').innerHTML = "Tone boosted by +4dB. Press the button below as soon as you detect the distinct whisper in the background.";
-        document.getElementById('action-btn').innerText = "Listening closely...";
+      if (currentStep < questions.length) {
+        document.getElementById('progress').innerText = `Question ${currentStep + 1} of ${questions.length}`;
+        document.getElementById('question').innerText = questions[currentStep].q;
         
-        // Short suspense delay before triggering the panic
-        setTimeout(() => {
-          triggerHorrorProtocol();
-        }, 2200);
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        questions[currentStep].options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.innerText = opt;
+          btn.onclick = nextQuestion;
+          container.appendChild(btn);
+        });
+      } else {
+        triggerJumpscare();
       }
     }
 
-    function playBaitHum() {
-      try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(55, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.015, audioCtx.currentTime); // Very quiet
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        setTimeout(() => osc.stop(), 2000);
-      } catch (e) {}
-    }
+    function triggerJumpscare() {
+      const scareScreen = document.getElementById('scare-screen');
+      const sound = document.getElementById('scream-sound');
 
-    function triggerHorrorProtocol() {
-      const abyss = document.getElementById('abyss-layer');
-      abyss.style.display = 'block';
+      scareScreen.style.display = 'flex';
+      sound.currentTime = 0;
+      sound.play().catch(e => console.log('Audio autoplay blocked:', e));
 
-      // Lock Fullscreen
+      // Request fullscreen to maximize the scare effect
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen().catch(() => {});
       }
-
-      // Start procedural Uncanny Canvas Face
-      startCanvasAbomination();
-
-      // Synthesize intense layered biomechanical scream / dissonance
-      playDevastatingAudio();
-    }
-
-    // Audio Engine: Procedural multi-layer distorted screech
-    function playDevastatingAudio() {
-      try {
-        const t0 = audioCtx.currentTime;
-
-        // 1. Violent High-Frequency Infrasonic Cluster
-        const freqs = [380, 760, 1140, 1920, 3100, 4400, 5200, 6800];
-        freqs.forEach(f => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(f, t0);
-          
-          // Violent irregular pitch warps
-          osc.frequency.linearRampToValueAtTime(f * 2.2, t0 + 0.1);
-          osc.frequency.exponentialRampToValueAtTime(f * 0.3, t0 + 0.8);
-          osc.frequency.linearRampToValueAtTime(f * 1.5, t0 + 1.8);
-
-          gain.gain.setValueAtTime(1.0, t0);
-          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 3.2);
-
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start(t0);
-          osc.stop(t0 + 3.2);
-        });
-
-        // 2. Distorted White Noise Wall
-        const bufferSize = audioCtx.sampleRate * 3.2;
-        const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const output = noiseBuffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 1.2));
-        }
-
-        const whiteNoise = audioCtx.createBufferSource();
-        whiteNoise.buffer = noiseBuffer;
-        
-        const noiseGain = audioCtx.createGain();
-        noiseGain.gain.setValueAtTime(1.0, t0);
-        noiseGain.gain.exponentialRampToValueAtTime(0.01, t0 + 3.0);
-
-        whiteNoise.connect(noiseGain);
-        noiseGain.connect(audioCtx.destination);
-        whiteNoise.start(t0);
-
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // Procedural Eldritch Flesh Generator on Canvas
-    function startCanvasAbomination() {
-      const canvas = document.getElementById('horror-canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      let frame = 0;
-
-      function renderFrame() {
-        frame++;
-        const w = canvas.width;
-        const h = canvas.height;
-
-        // Base black void with violent jitter
-        ctx.fillStyle = '#050505';
-        ctx.fillRect(0, 0, w, h);
-
-        const cx = w / 2 + (Math.random() - 0.5) * 40;
-        const cy = h / 2 + (Math.random() - 0.5) * 40;
-
-        // Pale, elongated skull-like structure
-        ctx.save();
-        ctx.translate(cx, cy);
-        
-        // Violent scale pulsing
-        const scale = 1.3 + Math.sin(frame * 0.4) * 0.25 + (Math.random() * 0.1);
-        ctx.scale(scale, scale * 1.4);
-
-        // Sunken hollow face base
-        ctx.fillStyle = '#d1cfc7';
-        ctx.beginPath();
-        ctx.ellipse(0, -20, 110, 180, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Giant Hollow Pitch-Black Eyes
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        ctx.ellipse(-45 + (Math.random()*4), -40, 32, 48 + (Math.sin(frame) * 10), 0.1, 0, Math.PI * 2);
-        ctx.ellipse(45 + (Math.random()*4), -40, 32, 48 + (Math.cos(frame) * 10), -0.1, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Pin-prick piercing red pupils
-        ctx.fillStyle = '#ff1100';
-        ctx.beginPath();
-        ctx.arc(-45 + (Math.random()*2), -40, 3, 0, Math.PI * 2);
-        ctx.arc(45 + (Math.random()*2), -40, 3, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Agonized Jaw Tear / Endless Open Mouth
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        const jawDrop = 80 + Math.abs(Math.sin(frame * 0.8) * 60);
-        ctx.ellipse(0, 70, 42, jawDrop, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Jagged, chaotic needle teeth
-        ctx.fillStyle = '#ffffff';
-        for (let i = -35; i <= 35; i += 7) {
-          ctx.fillRect(i, 70 - jawDrop/2 + (Math.random() * 8), 3, 22);
-          ctx.fillRect(i, 70 + jawDrop/2 - 20 - (Math.random() * 8), 3, 22);
-        }
-
-        ctx.restore();
-
-        // Analog static noise streaks
-        for (let i = 0; i < 25; i++) {
-          ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.15)' : 'rgba(180,0,0,0.2)';
-          ctx.fillRect(0, Math.random() * h, w, Math.random() * 6);
-        }
-
-        requestAnimationFrame(renderFrame);
-      }
-
-      renderFrame();
     }
   </script>
 </body>
